@@ -13,9 +13,9 @@ func init()  {
 
 func createTable(name string, source interface{})  {
 	db:=lib.GetDB()
-	has, err :=db.Exist(name)
+	has, err :=db.IsTableExist(name)
 	if err!=nil {
-		log.Fatalln("checkout table error:", name)
+		log.Fatalln("checkout table error:", err.Error())
 	}else if !has {
 		err = db.Sync2(source)
 		if err !=nil {

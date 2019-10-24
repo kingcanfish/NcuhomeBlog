@@ -6,5 +6,10 @@ var route *gin.Engine
 
 func init () {
 	route = gin.Default()
-	BlogGroup(route.Group("/api/blog"))
+	BlogRouteGroup(route.Group("/api/blog"))
+}
+
+func GetRoute() *gin.Engine {
+	return route
+	
 }

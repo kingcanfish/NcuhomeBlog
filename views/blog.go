@@ -6,7 +6,10 @@ import (
 	"NcuhomeBlog/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
+
+const author string = "NCUHOME"
 
 func BlogRouteGroup(g *gin.RouterGroup)  {
 	g.GET("/all", func(context *gin.Context) {
@@ -28,13 +31,23 @@ func BlogRouteGroup(g *gin.RouterGroup)  {
 		}
 
 	})
-	g.GET("/:id", func(context *gin.Context) {
+	g.GET("/get/:id", func(context *gin.Context) {
 		result, err := GetBlogByID(context)
 		if err != nil {
 			context.JSON(http.StatusInternalServerError, result)
 		} else {
 			context.JSON(http.StatusOK, result)
 		}
+	})
+
+	g.POST("/publish", func(context *gin.Context) {
+		 if result, err:= CreateBlog(context); err!=nil {
+		 	context.JSON(http.StatusInternalServerError, result)
+		 } else {
+			 context.JSON(http.StatusOK, result)
+		 }
+
+
 	})
 }
 
@@ -46,6 +59,7 @@ func GetAll(c *gin.Context)(map[string] interface{}, error)  {
 	if err!=nil {
 		return utils.FmtErrorReturn(err)
 	}
+	return utils.FmtNormalReturn(blogs, "ok")
 
 
 }
@@ -72,4 +86,33 @@ func GetBlogByID(c *gin.Context) (map[string] interface{}, error) {
 	} else {
 		return utils.FmtNormalReturn(blog)
 	}
+}
+
+func CreateBlog(c *gin.Context) (map[string] interface{}, error) {
+	modelBlog :=new(model.BlogModel)
+	if err:= c.ShouldBindJSON(modelBlog); err!=nil {
+		return utils.FmtErrorReturn(err)
+	} else {
+		 if has ,err := modelBlog.CheckExists(); err!=nil {
+		 	return utils.FmtErrorReturn(err)
+		 } else  if has{
+			return utils.FmtNormalReturn("", "该记录已经存在！")
+		 } else {
+		 	session := lib.GetDB().NewSession()
+		 	defer session.Close()
+			 if err := session.Begin(); err!=nil {
+				 return utils.FmtErrorReturn(err)
+			 }
+			 modelBlog.CreateTime = time.Now()
+			 modelBlog.Author = author
+			 if _ , err:= session.Insert(&modelBlog); err!= nil {
+			 	_ = session.Rollback()
+			 	return utils.FmtErrorReturn(err)
+			 }
+			 _ = session.Commit()
+			 return utils.FmtNormalReturn("", "提交成功～")
+		 }
+
+	}
+
 }
