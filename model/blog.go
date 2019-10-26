@@ -9,7 +9,7 @@ import (
 type BlogModel struct {
 	ID int  `xorm:"'id' int pk autoincr" json:"id"`
 	Title string `xorm:"'title' varchar(256) notnull" json:"title" binding:"required"`
-	Author string `xorm:"'author' varchar(64) notnull" json:"author" bingding:"required"`
+	Author string `xorm:"'author' varchar(64) notnull" json:"author" binding:"required"`
 	Type_ string `xorm:"'type' varchar(64) notnull" json:"type"`
 	CreateTime time.Time`xorm:"'create_time' datetime notnull" json:"-"`
 	ContentMD string `xorm:"'content_md' text" json:"content_md"`

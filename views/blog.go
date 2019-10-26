@@ -5,6 +5,7 @@ import (
 	"NcuhomeBlog/model"
 	"NcuhomeBlog/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"net/http"
 	"time"
 )
@@ -79,12 +80,15 @@ func GetBlogListByType(c *gin.Context) (map[string]interface{}, error)  {
 
 func GetBlogByID(c *gin.Context) (map[string] interface{}, error) {
 	id:=c.Param("id")
-	blog:= new(model.BlogModel)
-	err := lib.GetDB().Table(new(model.BlogModel).TableName()).Where("id = ?", id).Find(&blog)
+	if id == "0" {
+		return utils.FmtErrorReturn(errors.New("id cant be 0"))
+	}
+	blogs:= make([] *model.BlogModel, 0)
+	err := lib.GetDB().Table(new(model.BlogModel).TableName()).Where("id = ?", id).Find(&blogs)
 	if err!=nil {
 		return utils.FmtErrorReturn(err)
 	} else {
-		return utils.FmtNormalReturn(blog)
+		return utils.FmtNormalReturn(blogs[0])
 	}
 }
 
@@ -105,7 +109,7 @@ func CreateBlog(c *gin.Context) (map[string] interface{}, error) {
 			 }
 			 modelBlog.CreateTime = time.Now()
 			 modelBlog.Author = author
-			 if _ , err:= session.Insert(&modelBlog); err!= nil {
+			 if _ , err:= session.Insert(modelBlog); err!= nil {
 			 	_ = session.Rollback()
 			 	return utils.FmtErrorReturn(err)
 			 }
