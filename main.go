@@ -2,7 +2,7 @@ package main
 
 import "NcuhomeBlog/views"
 
-func main()  {
+func main() {
 	app := views.GetRoute()
 	app.Run(":8087")
 

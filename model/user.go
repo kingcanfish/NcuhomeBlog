@@ -9,3 +9,11 @@ type UserModel struct {
 func (model *UserModel) TableName() string {
 	return "users"
 }
+
+
+
+func (model *UserModel) SetPasswdHash(pwd string) (pwdhash string)  {
+	
+	return
+	
+}
